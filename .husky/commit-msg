@@ -1,0 +1,20 @@
+#!/usr/bin/env sh
+
+# Add common Node.js paths
+export PATH="/usr/local/bin:/opt/homebrew/bin:$HOME/.nvm/versions/node/$(ls $HOME/.nvm/versions/node 2>/dev/null | tail -1)/bin:$PATH"
+
+# Try to find node, skip if not available (VS Code Git commits)
+if ! command -v node >/dev/null 2>&1; then
+  echo "⚠️  Node.js not found, skipping commit message validation"
+  exit 0
+fi
+
+# Run commitlint
+if command -v npx >/dev/null 2>&1; then
+  npx --no -- commitlint --edit ${1}
+elif [ -f "./node_modules/.bin/commitlint" ]; then
+  ./node_modules/.bin/commitlint --edit ${1}
+else
+  echo "⚠️  commitlint not found, skipping validation"
+  exit 0
+fi

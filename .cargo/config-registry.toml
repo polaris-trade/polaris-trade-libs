@@ -1,0 +1,7 @@
+# Cargo registry configuration for GitHub Packages
+
+[registries.github]
+index = "sparse+https://github.com/polaris-trade/libs.git"
+
+[registry]
+default = "github"

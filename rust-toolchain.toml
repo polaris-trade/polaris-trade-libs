@@ -1,0 +1,14 @@
+# Rust toolchain configuration
+# This file specifies the Rust version for development
+
+[toolchain]
+# Use nightly for development (with clippy and rustfmt components)
+channel = "nightly"
+components = ["rustfmt", "clippy", "rust-src"]
+# Uncomment below to pin to a specific nightly date
+# channel = "nightly-2025-11-13"
+
+# For CI/CD: This file is for local development only.
+# CI will test against:
+# - 3 most recent stable versions (MSRV)
+# - Latest nightly (fetched daily)

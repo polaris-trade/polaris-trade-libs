@@ -1,0 +1,156 @@
+[config]
+min_version = "0.37.0"
+
+# --- Benchmark tasks ---
+[tasks.bench]
+description = "Run Criterion benchmarks and generate reports with native CPU optimizations"
+command = "cargo"
+args = ["bench"]
+env = { "RUSTFLAGS" = "-C target-cpu=native" }
+
+[tasks.bench-serve]
+description = "Serve live Criterion benchmark results with auto-refresh"
+script = ['''
+    echo "Starting live server at http://127.0.0.1:8080 ..."
+    cd target/criterion || exit 1
+    live-server --port=8080 --open=report/index.html
+    ''']
+dependencies = ["bench"]
+
+
+[env]
+CARGO_MAKE_EXTEND_WORKSPACE_MAKEFILE = true
+
+# --- Build tasks ---
+[tasks.watch-dev]
+description = "Development build for macOS (nightly) with native CPU optimizations"
+command = "cargo-watch"
+args = ["-x", "run -p itch_client -v"]
+env = { "RUSTUP_TOOLCHAIN" = "nightly", "RUSTFLAGS" = "-C target-cpu=native -Z codegen-backend=cranelift" }
+
+# 1. Build dev using nightly (mac)
+[tasks.dev]
+description = "Development build for macOS (nightly) with native CPU optimizations"
+command = "cargo"
+args = ["build"]
+env = { "RUSTUP_TOOLCHAIN" = "nightly", "RUSTFLAGS" = "-C target-cpu=native -Z codegen-backend=cranelift" }
+
+
+# 2. Build release using nightly (mac)
+[tasks.release-mac-nightly]
+description = "Release build for macOS (nightly) with native CPU optimizations"
+command = "cargo"
+args = ["build", "--release"]
+env = { "RUSTUP_TOOLCHAIN" = "nightly", "RUSTFLAGS" = "-C target-cpu=native -Z codegen-backend=llvm" }
+
+
+# 3. Build release stable (mac)
+[tasks.release-mac-stable]
+description = "Release build for macOS (stable) with native CPU optimizations"
+command = "cargo"
+args = ["build", "--release"]
+env = { "RUSTUP_TOOLCHAIN" = "stable", "RUSTFLAGS" = "-C target-cpu=native" }
+
+
+# 4. Build release for windows
+[tasks.release-windows-gnu]
+description = "Release build for Windows (stable, x86_64-pc-windows-gnu)"
+command = "cargo"
+args = ["build", "--release", "--target", "x86_64-pc-windows-gnu"]
+
+[tasks.release-windows-gnu.env]
+RUSTUP_TOOLCHAIN = "stable"
+CARGO_BUILD_RUSTC_WRAPPER = ""
+CARGO_BUILD_RUSTFLAGS = ""
+CC_x86_64_unknown_windows_gnu = "x86_64-w64-mingw32-gcc"
+CXX_x86_64_unknown_windows_gnu = "x86_64-w64-mingw32-g++"
+
+[tasks.release-windows-msvc]
+description = "Release build for Windows (stable, x86_64-pc-windows-msvc)"
+command = "cargo"
+args = ["build", "--release", "--target", "x86_64-pc-windows-msvc"]
+
+[tasks.release-windows-msvc.env]
+RUSTUP_TOOLCHAIN = "stable"
+CARGO_BUILD_RUSTC_WRAPPER = ""
+CARGO_BUILD_RUSTFLAGS = ""
+CC_x86_64_pc_windows_msvc = "zig cc -target x86_64-windows-msvc"
+CXX_x86_64_pc_windows_msvc = "zig c++ -target x86_64-windows-msvc"
+
+# 5. Build release for linux GNU
+# rustup target add x86_64-unknown-linux-gnu
+# brew intsall messense/macos-cross-toolchains/x86_64-unknown-linux-gnu
+[tasks.release-linux-gnu]
+description = "Release build for Linux (stable, x86_64-unknown-linux-gnu)"
+command = "cargo"
+args = ["build", "--release", "--target", "x86_64-unknown-linux-gnu"]
+
+[tasks.release-linux-gnu.env]
+RUSTUP_TOOLCHAIN = "stable"
+CARGO_BUILD_RUSTC_WRAPPER = ""
+CARGO_BUILD_RUSTFLAGS = ""
+CMAKE_SYSTEM_NAME = "Linux"
+CMAKE_SYSTEM_PROCESSOR = "x86_64"
+CMAKE_MAKE_PROGRAM = "/opt/homebrew/bin/gmake"
+
+# Disable all macOS arch/sysroot flags
+CMAKE_OSX_ARCHITECTURES = ""
+CMAKE_OSX_SYSROOT = ""
+CFLAGS = "-fPIC -O2"
+CXXFLAGS = "-fPIC -O2"
+CPPFLAGS = ""
+LDFLAGS = ""
+PKG_CONFIG_ALLOW_CROSS = "1"
+
+# Cross compiler paths
+CC_x86_64_unknown_linux_gnu = "/opt/homebrew/bin/x86_64-linux-gnu-gcc"
+CXX_x86_64_unknown_linux_gnu = "/opt/homebrew/bin/x86_64-linux-gnu-g++"
+AR_x86_64_unknown_linux_gnu = "/opt/homebrew/bin/x86_64-linux-gnu-ar"
+RANLIB_x86_64_unknown_linux_gnu = "/opt/homebrew/bin/x86_64-linux-gnu-ranlib"
+
+# For rdkafka-sys build script
+CMAKE_C_COMPILER = "/opt/homebrew/bin/x86_64-linux-gnu-gcc"
+CMAKE_CXX_COMPILER = "/opt/homebrew/bin/x86_64-linux-gnu-g++"
+CMAKE_C_FLAGS = "-fPIC -O2"
+CMAKE_CXX_FLAGS = "-fPIC -O2"
+
+
+# 5. Build release for linux MUSL
+# rustup target add x86_64-unknown-linux-musl
+# brew install FiloSottile/musl-cross/musl-cross
+[tasks.release-linux-musl]
+description = "Release build for Linux (stable, x86_64-unknown-linux-musl)"
+command = "cargo"
+args = ["build", "--release", "--target", "x86_64-unknown-linux-musl"]
+
+[tasks.release-linux-musl.env]
+RUSTUP_TOOLCHAIN = "stable"
+CARGO_BUILD_RUSTC_WRAPPER = ""
+CARGO_BUILD_RUSTFLAGS = ""
+CC_x86_64_unknown_linux_musl = "x86_64-linux-musl-gcc"
+CXX_x86_64_unknown_linux_musl = "x86_64-linux-musl-g++"
+
+# --- Utility tasks ---
+[tasks.build-all-release]
+description = "Build all release targets (stable)"
+dependencies = [
+  "release-mac-stable",
+  "release-windows-gnu",
+  # "release-windows-msvc",
+  "release-linux-musl",
+]
+
+[tasks.default]
+alias = "dev"
+
+[tasks.clippy]
+description = "Run Clippy linter on all workspace crates (strict mode)"
+command = "cargo"
+args = [
+  "clippy",
+  "--workspace",
+  "--all-targets",
+  "--all-features",
+  "--",
+  "-Dwarnings",
+]

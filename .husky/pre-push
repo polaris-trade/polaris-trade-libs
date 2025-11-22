@@ -1,0 +1,29 @@
+#!/usr/bin/env sh
+echo "⚡ Running pre-push checks..."
+echo ""
+
+# Validate branch name
+BRANCH_NAME=$(git symbolic-ref --short HEAD 2>/dev/null)
+# Allowed pattern: feature/, bugfix/, hotfix/, release/, docs/, chore/, etc.
+BRANCH_PATTERN="^(feature|feat|bugfix|hotfix|release|docs|chore|refactor|test|ci|staging|dev)\/[a-z0-9-]+$|^(main|master|develop|development|dev)$"
+
+if ! echo "$BRANCH_NAME" | grep -qE "$BRANCH_PATTERN"; then
+  echo "❌ Invalid branch name: $BRANCH_NAME"
+  echo ""
+  echo "Branch names must follow the pattern:"
+  echo "  - feature/description"
+  echo "  - bugfix/description" 
+  echo "  - hotfix/description"
+  echo "  - release/version"
+  echo "  - docs/description"
+  echo "  - chore/description"
+  echo "  - refactor/description"
+  echo "  - test/description"
+  echo "  - ci/description"
+  echo "  - main, master, develop, development, staging, dev"
+  echo ""
+  echo "Use lowercase letters, numbers, and hyphens only in the description."
+  echo "Example: feature/add-user-authentication"
+  echo "Rename your branch with: git branch -m <new-branch-name>"
+  exit 1
+fi
