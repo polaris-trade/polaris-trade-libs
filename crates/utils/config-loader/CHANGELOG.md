@@ -1,6 +1,6 @@
 # Changelog
 
-## [0.1.1](https://github.com/polaris-trade/polaris-trade-libs/compare/task-manager-v0.1.0...task-manager-v0.1.1) (2025-11-22)
+## [0.1.1](https://github.com/polaris-trade/polaris-trade-libs/compare/config-loader-v0.1.0...config-loader-v0.1.1) (2025-11-22)
 
 
 ### Features

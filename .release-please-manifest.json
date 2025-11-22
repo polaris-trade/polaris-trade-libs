@@ -1,6 +1,6 @@
 {
-  "crates/utils/http-client": "0.1.0",
-  "crates/utils/config-loader": "0.1.0",
-  "crates/utils/logger": "0.1.0",
-  "crates/utils/task-manager": "0.1.0"
+  "crates/utils/http-client": "0.1.1",
+  "crates/utils/config-loader": "0.1.1",
+  "crates/utils/logger": "0.1.1",
+  "crates/utils/task-manager": "0.1.1"
 }
