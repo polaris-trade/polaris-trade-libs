@@ -1,0 +1,90 @@
+# Development Rules
+
+## 1. Branch Types
+
+### `main` — Production / Release
+
+- Represents stable production code.
+- **Rules:**
+  - Use **Rebase & Merge**.
+  - Enforce **linear history**.
+  - No direct pushes.
+  - PR review required (optional if solo).
+
+---
+
+### `dev` — Integration / Development
+
+- Always branched from **`main`**.
+- Staging area for all features before release.
+- **Rules:**
+  - Use **Rebase & Merge**.
+  - Allow direct push.
+  - Maintain a **linear history** where possible.
+
+---
+
+## 2. Temporary Branches
+
+### `feat/*` — Feature Branches
+
+- Always branch from **`dev`**.
+- For new features, enhancements, refactors.
+- **Rules:**
+  - PR **to `dev`**.
+  - Use **Rebase & Merge** for clean history.
+  - Keep updated by **rebasing onto `dev`**, not merging from it.
+
+---
+
+### `hotfix/*` — Production Fixes
+
+- Always branch from **`main`**.
+- For urgent production-level fixes.
+- **Rules:**
+  - PR **to `main`** using **Squash & Merge**.
+  - After merging, **cherry-pick** the commit into `dev`.
+
+---
+
+## 4. Commit Strategy
+
+- Follow **conventional commits**. Ref: https://www.conventionalcommits.org/en/v1.0.0/
+- Keep commit message small and contained as we're using [release-please](https://github.com/googleapis/release-please) for releasing so it's better if commit is always scoped.
+- Keep feature commit history clean (rebasing allowed).
+- Avoid noisy merge commits—prefer **rebase** over merge for temporary branches.
+
+# Dev Tools & Environment Guidelines
+
+## 1. Editor / IDE
+
+Use whichever you are most productive with:
+
+- VS Code
+- RustRover
+- Neovim/vim
+
+Recommended extensions/tools:
+
+- Rust Analyzer
+- `rustfmt`
+- `clippy`
+- `cargo-make`
+
+**NOTE**: Install husky `pnpm install` this repo utilize husky for managing git hooks.
+
+---
+
+## 2. Toolchain & Compiler
+
+- Primary toolchain: **Stable Rust**.
+- Nightly allowed.
+- Maintain **MSRV = stable − 3 releases and latest nightly release where possible**.
+- All builds must pass: (done automatically via git hooks)
+
+```sh
+cargo check
+cargo clippy --all-targets --all-features
+cargo test --all
+cargo fmt --all --check
+```

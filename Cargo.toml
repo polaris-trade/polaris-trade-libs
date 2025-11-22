@@ -1,0 +1,69 @@
+[workspace]
+resolver = "3"
+members = [
+    "crates/_workspace-hack",
+    "crates/utils/config-loader",
+    "crates/utils/http-client",
+    "crates/utils/logger",
+    "crates/utils/task-manager",
+]
+
+[workspace.package]
+edition = "2024"
+authors = ["Gabriel Putra Pinastika <gabri.putra@gmail.com>"]
+license = "MIT"
+repository = "https://github.com/polaris-trade/libs"
+publish = ["github"]
+
+[workspace.dependencies]
+# Internal deps
+_workspace-hack = { path = "crates/_workspace-hack" }
+config-loader = { path = "crates/utils/config-loader" }
+http-client = { path = "crates/utils/http-client" }
+logger = { path = "crates/utils/logger" }
+task-manager = { path = "crates/utils/task-manager" }
+
+# External deps (default-features disabled everywhere)
+anyhow = "1.0.100"
+async-broadcast = { version = "0.7.2", default-features = false }
+async-trait = "0.1.89"
+config = { version = "0.15.19", default-features = false }
+core_affinity = { version = "*" }
+crossbeam-channel = { version = "0.5.15", default-features = false }
+disruptor = { version = "3.6.1" }
+http = { version = "1.3.1", default-features = false }
+opentelemetry = { version = "0.30.0", default-features = false }
+opentelemetry-appender-tracing = { version = "0.30.0", default-features = false }
+opentelemetry-otlp = { version = "0.30.0", default-features = false }
+opentelemetry-proto = { version = "0.30.0", default-features = false }
+opentelemetry-semantic-conventions = { version = "0.30.0", default-features = false }
+opentelemetry-stdout = { version = "0.30.0", default-features = false }
+opentelemetry_sdk = { version = "0.30.0", default-features = false }
+reqwest = { version = "0.12.24", default-features = false }
+reqwest-middleware = { version = "0.4.2", default-features = false }
+reqwest-retry = { version = "0.7.0", default-features = false }
+reqwest-tracing = { version = "0.5.8", default-features = false }
+serde = { version = "1.0.228", default-features = false, features = ["derive"] }
+serde_json = { version = "1.0.145", default-features = false }
+sysinfo = { version = "0.37.2", default-features = false }
+thiserror = { version = "2.0.17", default-features = false }
+time = { version = "0.3.44", default-features = false }
+tokio = { version = "1.48.0", default-features = false, features = [] }
+tokio-graceful-shutdown = { version = "0.19.0", default-features = false }
+tokio-util = { version = "0.7.17", default-features = false }
+tonic = { version = "0.14.2", default-features = false }
+tracing = { version = "0.1.41", default-features = false }
+tracing-appender = { version = "0.2.3", default-features = false }
+tracing-attributes = { version = "0.1.30", default-features = false }
+tracing-core = { version = "0.1.34", default-features = false }
+tracing-error = { version = "0.2.1", default-features = false }
+tracing-opentelemetry = { version = "0.31.0", default-features = false }
+tracing-subscriber = { version = "0.3.20", default-features = false }
+tracing-unwrap = { version = "1.0.1", default-features = false }
+
+[profile.ci]
+inherits = "dev"
+opt-level = 0
+debug = false
+strip = "debuginfo"
+codegen-units = 16

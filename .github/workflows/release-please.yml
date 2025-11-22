@@ -1,0 +1,53 @@
+name: Release Please
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: write
+  pull-requests: write
+  packages: write
+
+env:
+  RUST_BACKTRACE: 1
+
+jobs:
+  release-please:
+    name: Create Release PR
+    runs-on: ubuntu-latest
+    outputs:
+      releases_created: ${{ steps.release.outputs.releases_created }}
+      paths_released: ${{ steps.release.outputs.paths_released }}
+    steps:
+      - uses: googleapis/release-please-action@v4
+        id: release
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+  publish-release:
+    name: Create Release Tags
+    runs-on: ubuntu-latest
+    needs: release-please
+    if: ${{ needs.release-please.outputs.releases_created == 'true' }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Release Info
+        run: |
+          echo "✅ Release tags created successfully!"
+          echo ""
+          echo "📦 Use in your projects with git dependencies:"
+          echo ""
+          echo "[dependencies]"
+          echo "config_loader = { git = "https://github.com/polaris-trade/libs", tag = "config_loader-v0.2.1" }"
+          echo "uuid-generator = { git = "https://github.com/polaris-trade/libs", tag = "uuid-generator-v0.1.5" }"
+          echo ""
+          echo "🚀 For faster git fetching, add to ~/.cargo/config.toml:"
+          echo ""
+          echo "[net]"
+          echo "git-fetch-with-cli = true"
+          echo ""
+          echo "Or use SSH for faster clones:"
+          echo "config_loader = { git = \"ssh://git@github.com/polaris-trade/libs\" }"

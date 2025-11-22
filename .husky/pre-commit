@@ -1,0 +1,36 @@
+#!/usr/bin/env sh
+
+echo "🔧 Auto-formatting code..."
+cargo fmt --all
+
+echo "📦 Sorting Cargo.toml dependencies..."
+# Find and format all Cargo.toml files
+find . -name "Cargo.toml" -not -path "./target/*" -exec sh -c '
+  if command -v cargo-sort >/dev/null 2>&1; then
+    cargo sort --workspace --grouped "{}"
+  else
+    echo "⚠️  cargo-sort not installed, skipping dependency sorting"
+    echo "   Install with: cargo install cargo-sort"
+  fi
+' \;
+
+# Stage formatted files
+git add -u
+
+echo "✅ Code formatted and staged"
+
+echo "📋 Running clippy..."
+cargo make clippy || {
+  echo "❌ Clippy failed."
+  exit 1
+}
+
+# Optimized build and test
+echo "🔨 Building..."
+export RUSTFLAGS="-C codegen-units=16 -C debuginfo=0"
+cargo build --profile ci >/dev/null 2>&1 || { echo "❌ Build failed!"; cargo build --profile ci; exit 1; }
+
+echo "🧪 Running tests..."
+cargo nextest run --profile ci 2>&1 | grep -v "^\s*Compiling\|^\s*Finished\|^\s*Running" || cargo test --quiet || exit 1
+
+echo "✅ All checks passed!"

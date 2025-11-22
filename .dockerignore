@@ -1,0 +1,32 @@
+# Ignore build artifacts
+target/
+**/*.rs.bk
+*.pdb
+
+# Ignore logs
+logs/
+*.log
+
+# Ignore backup files  
+backup/
+
+# Ignore OS files
+.DS_Store
+Thumbs.db
+
+# Ignore IDE files
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Ignore git
+.git/
+.gitignore
+
+# Don't ignore these files
+!Dockerfile*
+!docker-compose.yml
+!.cargo/
+!scripts/
